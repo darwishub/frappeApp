@@ -1,0 +1,6 @@
+@import './assets/Inter/inter.css';
+@import 'frappe-ui/src/style.css';
+
+body {
+    background-color: #F3F3F3;
+}
