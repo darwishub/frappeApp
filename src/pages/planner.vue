@@ -6,7 +6,7 @@
                     Prev
                 </Button>
                 <div class="bg-white py-1 px-3 rounded">
-                    KW40
+                    KW{{ currentKW }}
                 </div>
                 <Button :variant="'solid'" theme="gray" size="md" label="Button" @click="goToNextWeek">
                     Next
@@ -89,6 +89,7 @@
                 </div>
             </div>
         </div>
+        <pre>Dummy JSON => {{ employees }}</pre>
     </layout>
 </template>
 
@@ -99,6 +100,7 @@ import { useElementBounding } from '@vueuse/core'
 
 let isProfileChecked = ref(true);
 let currentDate = ref(new Date().toISOString());
+let currentKW = ref(1);
 
 const timeLine = ref();
 const { width: timeLineWidth } = useElementBounding(timeLine);
@@ -132,10 +134,14 @@ const currentWeek = computed(() => {
 });
 
 const goToPrevWeek = () => {
+    if (currentKW.value > 1) {
+        currentKW.value--;
+    }
     currentDate.value = new Date(new Date(currentDate.value).getTime() - 7 * 24 * 60 * 60 * 1000).toISOString();
 };
 
 const goToNextWeek = () => {
+    currentKW.value++;
     currentDate.value = new Date(new Date(currentDate.value).getTime() + 7 * 24 * 60 * 60 * 1000).toISOString();
 };
 
