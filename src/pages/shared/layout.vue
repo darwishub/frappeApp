@@ -1,7 +1,7 @@
 <template>
     <div class="wrapper">
         <div class="p-3 bg-white">
-            <div class="container mx-auto">
+            <div class="mx-auto px-8 max-w-[1800px]">
                 <Breadcrumbs :items="[
                     {
                         label: 'Planner',
