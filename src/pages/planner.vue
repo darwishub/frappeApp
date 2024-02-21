@@ -14,41 +14,59 @@
             </div>
             <div class="flex justify-between items-start gap-6">
                 <div class="w-9/12">
-                    <div class="bg-white rounded p-3 overflow-x-auto">
-                        <div class="relative rounded-xl overflow-auto">
-                            <div class="bg-white dark:bg-slate-800 shadow-xl overflow-hidden">
-                                <div
-                                    class="overflow-scroll grid grid-rows-[auto,repeat(100,auto)] grid-cols-[150px,repeat(7,150px)] max-h-[350px]">
-                                    <!-- Calendar frame -->
+                    <div class="bg-white rounded p-3">
+                        <div class="relative">
+                            <div class="flex" ref="timeLine">
+                                <div class="flex flex-col">
                                     <div
-                                        class="row-start-[1] col-start-[1] sticky top-0 z-10 bg-white dark:bg-gradient-to-b dark:from-slate-600 dark:to-slate-700 border-slate-100 dark:border-black/10 bg-clip-padding text-slate-900 dark:text-slate-200 border-b text-sm font-medium py-2">
+                                        class="flex shrink-0 grow-0 overflow-hidden border-b border-r w-40 text-center h-14">
                                     </div>
-
-                                    <div v-for="(day, index) in currentWeek" :key="index"
-                                        class="row-start-[1] sticky top-0 z-10 bg-white dark:bg-gradient-to-b dark:from-slate-600 dark:to-slate-700 border-slate-100 dark:border-black/10 bg-clip-padding text-slate-900 dark:text-slate-200 border-b border-r text-sm font-medium py-2 text-center"
-                                        :class="`col-start-[${index + 2}]`">
-                                        <p class="text-sm mb-2">{{ day.dayName }}</p>
-                                        <p class="text-sm">{{ day.date }}</p>
+                                    <div class="flex shrink-0 grow-0 overflow-hidden border-b border-r w-40 text-center"
+                                        :style="`height: ${56 * employee.tasks.length}px`"
+                                        v-for="(employee, employeeIndex) in mappedEmployees" :key="employeeIndex">
+                                        <div class="flex justify-start items-center">
+                                            <Avatar :shape="'circle'" :image="employee.avatar" label="EY" size="xl"
+                                                :class="{ 'mr-3': isProfileChecked }" />
+                                            <p class="text-sm text-left leading-4">{{ employee.name }}</p>
+                                        </div>
                                     </div>
-
-                                    <template v-for="(employee, employeeIndex) in employees" :key="employeeIndex">
-                                        <div class="flex justify-start items-center border-slate-100 dark:border-slate-200/5 border-b border-r text-base p-1.5 text-right text-slate-400 sticky left-0 bg-white dark:bg-slate-800 font-medium"
-                                            :class="`row-start-[${employeeIndex + 2}] col-start-[1]`">
-                                            <div class="flex justify-start items-center">
-                                                <Avatar :shape="'circle'" :image="employee.avatar" label="EY" size="xl"
-                                                    :class="{ 'mr-3': isProfileChecked }" />
-                                                <p class="text-sm text-left leading-4">{{ employee.name }}</p>
+                                </div>
+                                <div class="flex flex-col">
+                                    <div class="flex">
+                                        <div class="flex flex-col shrink-0 grow-0 overflow-hidden whitespace-nowrap border-b border-r w-40 text-center"
+                                            v-for="(day, dayIndex) in currentWeek" :key="dayIndex">
+                                            <div class="flex flex-col justify-center items-center p-2">
+                                                <p class="text-sm mb-2">{{ day.dayName }}</p>
+                                                <p class="text-sm">{{ day.date }}</p>
                                             </div>
                                         </div>
-                                        <template v-for="(day, dayIndex) in currentWeek.length">
-                                            <div class="border-slate-100 dark:border-slate-200/5 border-b"
-                                                :class="`row-start-[${employeeIndex + 2}] col-start-[${dayIndex + 2}]`">
-                                                
+                                    </div>
+                                    <template v-for="(employee, employeeIndex) in mappedEmployees" :key="employeeIndex">
+                                        <div class="flex overflow-hidden w-full h-14"
+                                            v-for="taskCount in employee.tasks.length">
+                                            <div class="flex flex-col shrink-0 grow-0 overflow-hidden whitespace-nowrap border-b border-r w-40 text-center h-full"
+                                                v-for="(day, dayIndex) in currentWeek" :key="dayIndex">
                                             </div>
-                                        </template>
+                                        </div>
                                     </template>
-
                                 </div>
+                            </div>
+                            <div class="row-items absolute overflow-hidden left-40 top-14 touch-none">
+                                <template v-for="(employee, employeeIndex) in mappedEmployees" :key="employeeIndex">
+                                    <div class="overflow-hidden relative h-14" v-for="taskCount in employee.tasks"
+                                        :style="`width: ${timeLineWidth - 160}px`">
+                                        <div class="flex justify-center select-none cursor-grab flex-col bg-gray-300 py-1 px-2 rounded absolute top-0.5 h-12"
+                                            v-if="Object.keys(taskCount).length > 0" :style="`left: ${(taskCount.startDayOfWeek - 1) * 160}px;width: ${((taskCount.endDayOfWeek - taskCount.startDayOfWeek) + 1) * 160}px;`
+                                                ">
+                                            <div class="flex justify-between items-center">
+                                                <p class="text-xs mb-2">{{ taskCount.title }}</p>
+                                            </div>
+                                            <div class="flex justify-start items-center">
+                                                <p class="text-xs">{{ taskCount.address }}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </template>
                             </div>
                         </div>
                     </div>
@@ -77,10 +95,13 @@
 <script setup>
 import Layout from "@/pages/shared/layout.vue";
 import { computed, ref } from "vue";
+import { useElementBounding } from '@vueuse/core'
 
 let isProfileChecked = ref(true);
 let currentDate = ref(new Date().toISOString());
 
+const timeLine = ref();
+const { width: timeLineWidth } = useElementBounding(timeLine);
 const toggleProfile = () => {
     isProfileChecked.value = !isProfileChecked.value;
 };
@@ -118,18 +139,27 @@ const goToNextWeek = () => {
     currentDate.value = new Date(new Date(currentDate.value).getTime() + 7 * 24 * 60 * 60 * 1000).toISOString();
 };
 
-const employees = [
+const employees = ref([
     {
         id: 1,
         name: "Muhammad Darwis Arifin",
         avatar: "https://i.pravatar.cc/400?img=70",
         tasks: [
             {
+                id: '1-a',
                 title: "P-ANL-20222024-01-Montage",
                 duration: "6 Tage",
                 address: "Hofnerstrasse 4, Haus B, 8888 Unterageri",
                 startDate: "2024-02-21T01:55:26.115Z",
                 endDate: "2024-02-23T01:55:26.115Z",
+            },
+            {
+                id: '1-b',
+                title: "P-ANL-20222024-01-Montage",
+                duration: "6 Tage",
+                address: "Hofnerstrasse 4, Haus B, 8888 Unterageri",
+                startDate: "2024-02-23T01:55:26.115Z",
+                endDate: "2024-02-25T01:55:26.115Z",
             },
         ],
     },
@@ -143,13 +173,39 @@ const employees = [
         id: 3,
         name: "John Doe",
         avatar: "https://i.pravatar.cc/400?img=68",
-        tasks: [],
+        tasks: [
+            {
+                id: '1-b',
+                title: "P-ANL-20222024-01-Montage",
+                duration: "6 Tage",
+                address: "Hofnerstrasse 4, Haus B, 8888 Unterageri",
+                startDate: "2024-02-23T01:55:26.115Z",
+                endDate: "2024-02-25T01:55:26.115Z",
+            },
+            {
+                id: '1-b',
+                title: "P-ANL-20222024-01-Montage",
+                duration: "6 Tage",
+                address: "Hofnerstrasse 4, Haus B, 8888 Unterageri",
+                startDate: "2024-02-23T01:55:26.115Z",
+                endDate: "2024-02-25T01:55:26.115Z",
+            },
+        ],
     },
     {
         id: 4,
         name: "Marco Simeone",
         avatar: "https://i.pravatar.cc/400?img=64",
-        tasks: [],
+        tasks: [
+            {
+                id: '1-b',
+                title: "P-ANL-20222024-01-Montage",
+                duration: "6 Tage",
+                address: "Hofnerstrasse 4, Haus B, 8888 Unterageri",
+                startDate: "2024-02-20T01:55:26.115Z",
+                endDate: "2024-02-22T01:55:26.115Z",
+            },
+        ],
     },
     {
         id: 5,
@@ -163,7 +219,47 @@ const employees = [
         avatar: "https://i.pravatar.cc/400?img=56",
         tasks: [],
     },
-];
+]);
+
+function getMappedWeek(date) {
+    const firstDayOfYear = new Date(date.getFullYear(), 0, 1);
+    const pastDaysOfYear = (date - firstDayOfYear) / 86400000;
+    return Math.ceil((pastDaysOfYear + firstDayOfYear.getDay() + 1) / 7);
+}
+
+const mappedEmployees = computed(() => {
+    const currentWeek = getMappedWeek(new Date());
+
+    return employees.value.map(employee => {
+        if (employee.tasks.length === 0) {
+            return { ...employee, tasks: [{}] };
+        } else {
+            return {
+                ...employee,
+                tasks: employee.tasks.map(task => {
+                    if (task.startDate && task.endDate) {
+                        const startDate = new Date(task.startDate);
+                        const endDate = new Date(task.endDate);
+                        const taskStartWeek = getMappedWeek(startDate);
+                        const taskEndWeek = getMappedWeek(endDate);
+                        const taskStartDay = startDate.getDay();
+                        const taskEndDay = endDate.getDay() === 0 ? 7 : endDate.getDay();
+
+                        let updatedTask = { ...task, endDayOfWeek: taskEndDay };
+
+                        if (taskStartWeek === currentWeek) {
+                            updatedTask = { ...updatedTask, startDayOfWeek: taskStartDay };
+                        }
+
+                        return updatedTask;
+                    }
+
+                    return task;
+                })
+            };
+        }
+    });
+});
 
 </script>
 
