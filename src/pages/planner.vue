@@ -6,7 +6,7 @@
                     Prev
                 </Button>
                 <div class="bg-white py-1 px-3 rounded">
-                    KW{{ currentKW }}
+                    KW{{ weekOfMonth }}
                 </div>
                 <Button :variant="'solid'" theme="gray" size="md" label="Button" @click="goToNextWeek">
                     Next
@@ -51,9 +51,9 @@
                                     </template>
                                 </div>
                             </div>
-                            <div class="row-items absolute overflow-hidden left-40 top-14 touch-none">
+                            <div class="row-items absolute left-40 top-14 touch-none">
                                 <template v-for="(employee, employeeIndex) in mappedEmployees" :key="employeeIndex">
-                                    <div class="overflow-hidden relative h-14" v-for="taskCount in employee.tasks"
+                                    <div class="relative h-14" v-for="taskCount in employee.tasks"
                                         :style="`width: ${timeLineWidth - 160}px`">
                                         <div class="flex flex-row justify-between select-none cursor-grab bg-gray-300 p-1 rounded absolute top-0.5 h-12"
                                             v-if="Object.keys(taskCount).length > 0" :style="`left: ${(taskCount.startDayOfWeek - 1) * 160}px;width: ${((taskCount.endDayOfWeek - taskCount.startDayOfWeek) + 1) * 160}px;`
@@ -91,18 +91,16 @@
                 </div>
             </div>
         </div>
-        <pre>Dummy JSON => {{ employees }}</pre>
     </layout>
 </template>
 
 <script setup>
 import Layout from "@/pages/shared/layout.vue";
-import { computed, ref } from "vue";
-import { useElementBounding } from '@vueuse/core'
+import { computed, ref, onMounted } from "vue";
+import { useElementBounding } from '@vueuse/core';
 
 let isProfileChecked = ref(true);
 let currentDate = ref(new Date().toISOString());
-let currentKW = ref(1);
 
 const timeLine = ref();
 const { width: timeLineWidth } = useElementBounding(timeLine);
@@ -136,16 +134,19 @@ const currentWeek = computed(() => {
 });
 
 const goToPrevWeek = () => {
-    if (currentKW.value > 1) {
-        currentKW.value--;
-    }
     currentDate.value = new Date(new Date(currentDate.value).getTime() - 7 * 24 * 60 * 60 * 1000).toISOString();
 };
 
 const goToNextWeek = () => {
-    currentKW.value++;
     currentDate.value = new Date(new Date(currentDate.value).getTime() + 7 * 24 * 60 * 60 * 1000).toISOString();
 };
+
+const weekOfMonth = computed(() => {
+    let date = new Date(currentDate.value);
+    let adjustedDate = date.getDate() + date.getDay();
+    let prefixes = [-1, 0, 1, 2, 3, 4, 5];
+    return prefixes[0 | adjustedDate / 7] + 1;
+});
 
 const employees = ref([
     {
@@ -268,6 +269,7 @@ const mappedEmployees = computed(() => {
         }
     });
 });
+
 
 </script>
 
