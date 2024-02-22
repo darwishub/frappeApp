@@ -55,15 +55,17 @@
                                 <template v-for="(employee, employeeIndex) in mappedEmployees" :key="employeeIndex">
                                     <div class="overflow-hidden relative h-14" v-for="taskCount in employee.tasks"
                                         :style="`width: ${timeLineWidth - 160}px`">
-                                        <div class="flex justify-center select-none cursor-grab flex-col bg-gray-300 py-1 px-2 rounded absolute top-0.5 h-12"
+                                        <div class="flex flex-row justify-between select-none cursor-grab bg-gray-300 p-1 rounded absolute top-0.5 h-12"
                                             v-if="Object.keys(taskCount).length > 0" :style="`left: ${(taskCount.startDayOfWeek - 1) * 160}px;width: ${((taskCount.endDayOfWeek - taskCount.startDayOfWeek) + 1) * 160}px;`
                                                 ">
-                                            <div class="flex justify-between items-center">
-                                                <p class="text-xs mb-2">{{ taskCount.title }}</p>
+                                            <div class="flex justify-start gap-3">
+                                                <div class="bg-white h-full w-2 rounded cursor-ew-resize"></div>
+                                                <div class="flex justify-center items-start flex-col">
+                                                    <p class="text-xs mb-2">{{ taskCount.title }}</p>
+                                                    <p class="text-xs font-semibold">{{ taskCount.address }}</p>
+                                                </div>
                                             </div>
-                                            <div class="flex justify-start items-center">
-                                                <p class="text-xs">{{ taskCount.address }}</p>
-                                            </div>
+                                            <div class="bg-white h-full w-2 rounded cursor-ew-resize"></div>
                                         </div>
                                     </div>
                                 </template>
