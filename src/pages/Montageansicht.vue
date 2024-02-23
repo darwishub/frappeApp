@@ -1,7 +1,7 @@
 <template>
-    <layout>
+    <layout :breadcrumbs="breadcrumbs">
         <div class="mx-auto px-8 max-w-[1800px]">
-            <div class="flex justify-start items-center gap-x-2 mt-12 mb-6">
+            <div class="flex justify-start items-center gap-x-2 mb-6">
                 <Button :variant="'solid'" theme="gray" size="md" label="Button" @click="goToPrevWeek">
                     Prev
                 </Button>
@@ -26,7 +26,7 @@
                                         v-for="(employee, employeeIndex) in mappedEmployees" :key="employeeIndex">
                                         <div class="flex justify-start items-center">
                                             <Avatar :shape="'circle'" :image="employee.avatar" label="EY" size="xl"
-                                                :class="{ 'mr-3': isProfileChecked }" />
+                                                class="mr-3" />
                                             <p class="text-sm text-left leading-4">{{ employee.name }}</p>
                                         </div>
                                     </div>
@@ -55,9 +55,9 @@
                                 <template v-for="(employee, employeeIndex) in mappedEmployees" :key="employeeIndex">
                                     <div class="relative h-14" v-for="taskCount in employee.tasks"
                                         :style="`width: ${timeLineWidth - 160}px`">
-                                        <div class="flex flex-row justify-between select-none cursor-grab bg-gray-300 p-1 rounded absolute top-0.5 h-12"
+                                        <div class="flex flex-row justify-between select-none bg-gray-300 p-1 rounded absolute top-0.5 h-12"
                                             v-if="Object.keys(taskCount).length > 0" :style="`left: ${(taskCount.startDayOfWeek - 1) * 160}px;width: ${((taskCount.endDayOfWeek - taskCount.startDayOfWeek) + 1) * 160}px;`
-                                                ">
+                                                " @click="openTaskDetail">
                                             <div class="flex justify-start gap-3">
                                                 <div class="bg-white h-full w-2 rounded cursor-ew-resize"></div>
                                                 <div class="flex justify-center items-start flex-col">
@@ -75,18 +75,30 @@
                 </div>
                 <div class="w-3/12">
                     <div class="bg-white rounded p-3">
-                        <p class="text-lg mb-3">Backlog</p>
-                        <div class="grid grid-rows gap-3">
-                            <div class="flex flex-col bg-gray-300 p-3 rounded gap-2">
-                                <div class="flex justify-between items-center">
-                                    <p class="text-xs">P-ANL-20222024-01-Montage</p>
-                                    <p class="text-xs">6 Tage</p>
-                                </div>
-                                <div class="flex justify-start items-center">
-                                    <p class="text-xs">Hofnerstrasse 4, Haus B, 8888 Unterageri</p>
+                        <template v-if="!isTaskFormActive">
+                            <p class="text-lg mb-3">Backlog</p>
+                            <div class="grid grid-rows gap-3 mb-3">
+                                <div class="flex flex-col bg-gray-300 p-3 rounded gap-2">
+                                    <div class="flex justify-between items-center">
+                                        <p class="text-xs">P-ANL-20222024-01-Montage</p>
+                                        <p class="text-xs">6 Tage</p>
+                                    </div>
+                                    <div class="flex justify-start items-center">
+                                        <p class="text-xs">Hofnerstrasse 4, Haus B, 8888 Unterageri</p>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
+                        </template>
+                        <template v-else>
+                            <div class="mb-3 flex justify-between items-center">
+                                <p class="text-lg">Task 40031</p>
+                                <Button :variant="'solid'" theme="gray" size="sm" label="Button" :loadingText="null"
+                                    :disabled="false" :link="null" icon="arrow-left" :loading="false"
+                                    @click="backToBackLog">
+                                </Button>
+                            </div>
+                            <TaskForm />
+                        </template>
                     </div>
                 </div>
             </div>
@@ -95,22 +107,29 @@
 </template>
 
 <script setup>
-import Layout from "@/pages/shared/layout.vue";
+import Layout from "@/pages/shared/Layout.vue";
 import { computed, ref, onMounted } from "vue";
 import { useElementBounding } from '@vueuse/core';
+import TaskForm from "@/components/Task/TaskForm.vue";
 
-let isProfileChecked = ref(true);
+let breadcrumbs = [
+    {
+        label: 'Dashboard',
+        route: {
+            name: 'Dashboard',
+        },
+    },
+    {
+        label: 'Montageansicht',
+        route: {
+            name: 'Montageansicht',
+        },
+    },
+];
 let currentDate = ref(new Date().toISOString());
-
+let isTaskFormActive = ref(false);
 const timeLine = ref();
 const { width: timeLineWidth } = useElementBounding(timeLine);
-const toggleProfile = () => {
-    isProfileChecked.value = !isProfileChecked.value;
-};
-
-const columnProfileWidth = computed(() => {
-    return isProfileChecked.value ? '250px' : 'auto';
-});
 
 const getWeek = (startFrom) => {
     let week = [];
@@ -270,6 +289,13 @@ const mappedEmployees = computed(() => {
     });
 });
 
+const openTaskDetail = () => {
+    isTaskFormActive.value = true;
+};
+
+const backToBackLog = () => {
+    isTaskFormActive.value = false;
+};
 
 </script>
 

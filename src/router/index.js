@@ -1,21 +1,36 @@
 import { createRouter, createWebHistory } from "vue-router";
 
-const Planner = () => import("@/pages/planner.vue");
+const Montageansicht = () => import("@/pages/Montageansicht.vue");
+const SignIn = () => import("@/pages/SignIn.vue");
+const Dashboard = () => import("@/pages/Dashboard.vue");
 
 // import { AuthStore } from "@/stores/AuthStore"
 
 const routes = [
-  {
-    path: "/:pathMatch(.*)*",
-    redirect: '/login'
-  },
+  // {
+  //   path: "/:pathMatch(.*)*",
+  //   redirect: '/login'
+  // },
   {
     path: "/",
-    name: "Planner",
-    component: Planner,
+    name: "Dashboard",
+    component: Dashboard,
     meta: {
       requiresAuth: true
     }
+  },
+  {
+    path: "/montageansicht",
+    name: "Montageansicht",
+    component: Montageansicht,
+    meta: {
+      requiresAuth: true
+    }
+  },
+  {
+    path: "/signin",
+    name: "SignIn",
+    component: SignIn,
   },
 ];
 

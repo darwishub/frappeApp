@@ -11,7 +11,10 @@ import { setConfig, frappeRequest, resourcesPlugin,
     Button, 
     Breadcrumbs,
     Avatar,  
-    Switch,
+    FormControl,
+    FeatherIcon,
+    Select,
+    Dropdown
 } from 'frappe-ui'
 
 const pinia = createPinia();
@@ -27,5 +30,8 @@ app.provide('axios', app.config.globalProperties.axios)
 app.component('Button', Button)
 app.component('Breadcrumbs', Breadcrumbs)
 app.component('Avatar', Avatar)
-app.component('Switch', Switch)
+app.component('FormControl', FormControl)
+app.component('FeatherIcon', FeatherIcon)
+app.component('Select', Select)
+app.component('Dropdown', Dropdown)
 app.mount("#app");
