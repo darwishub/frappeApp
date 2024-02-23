@@ -32,7 +32,8 @@
 import { ref } from 'vue'
 import { FormControl, createResource } from 'frappe-ui'
 import { useRouter } from 'vue-router';
-import router from '../router';
+
+const router = useRouter();
 
 let showEmailLogin = ref(false);
 let email = ref('admin@planner.com');
