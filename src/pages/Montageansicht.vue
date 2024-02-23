@@ -1,5 +1,5 @@
 <template>
-    <layout :breadcrumbs="breadcrumbs">
+    <Layout :breadcrumbs="breadcrumbs">
         <div class="mx-auto px-8 max-w-[1800px]">
             <div class="flex justify-start items-center gap-x-2 mb-6">
                 <Button :variant="'solid'" theme="gray" size="md" label="Button" @click="goToPrevWeek">
@@ -103,7 +103,7 @@
                 </div>
             </div>
         </div>
-    </layout>
+    </Layout>
 </template>
 
 <script setup>

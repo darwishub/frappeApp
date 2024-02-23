@@ -1,5 +1,5 @@
 <template>
-    <layout :breadcrumbs="breadcrumbs">
+    <Layout :breadcrumbs="breadcrumbs">
         <div class="mx-auto px-8 max-w-[1800px]">
             <div class="flex justify-between items-center my-6">
                 <div>
@@ -27,7 +27,7 @@
                 </router-link>
             </div>
         </div>
-    </layout>
+    </Layout>
 </template>
 
 <script setup>
